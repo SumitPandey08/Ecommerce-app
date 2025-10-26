@@ -5,8 +5,8 @@ import sendStyledOTP from "../helper/nodemailer.js";
 import accessToken from "../helper/token.js";
 
 export const signUp = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
         res.status(400); throw new Error("Please fill all fields");
     }
     const userExists = await User.findOne({ email });
@@ -18,7 +18,7 @@ export const signUp = asyncHandler(async (req, res) => {
     const hashedOTP = bcrypt.hashSync(otp.toString(), 10);
     await sendStyledOTP(email, otp);
     const user = await User.create({
-        name, email, password,
+        username, email, password,
         verifyToken: hashedOTP, verifyTokenExpiration: otpExpiration, isVerified: false,
     });
     if (user) {
@@ -208,7 +208,7 @@ export const updateCart = asyncHandler(async (req, res) => {
 });
 
 export const removeCartItem = asyncHandler(async (req, res) => {
-    const { productId } = req.body;
+    const { productId } = req.params;
     const user = await User.findById(req.user.id);
     if (!user) {
         res.status(404); throw new Error("User not found");

@@ -7,7 +7,6 @@ import {
   deleteProduct,
   filterProducts,
   getSellerProducts,
-  searchProducts
 } from "../controllers/product.controller.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/multerMiddleware.js";
@@ -28,7 +27,7 @@ router.put("/:id", protect, upload.array('images', 5), updateProduct);
 
 router.delete("/:id", protect, deleteProduct);
 
-router.get("/search", searchProducts);
+//router.get("/search", searchProducts);
 
 router.get("/", getAllProducts);
 

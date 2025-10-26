@@ -3,7 +3,7 @@ import Seller from "../models/seller.model.js";
 import asyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import elasticsearchClient from "../utils/elasticSerachClient.js";
+//import elasticsearchClient from "../utils/elasticSerachClient.js";
 
 // CREATE PRODUCT with Cloudinary image upload support
 export const createProduct = asyncHandler(async (req, res) => {
@@ -187,43 +187,43 @@ export const filterProducts = asyncHandler(async (req, res) => {
 // elastis base search
 
 
-export const searchProducts = asyncHandler(async (req, res) => {
- try {
-  const searchText = req.query.q;
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+// export const searchProducts = asyncHandler(async (req, res) => {
+//  try {
+//   const searchText = req.query.q;
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
+//   const skip = (page - 1) * limit;
   
-  if (!searchText) {
-    res.status(400);
-    throw new Error("Search text is required.");
-  }
+//   if (!searchText) {
+//     res.status(400);
+//     throw new Error("Search text is required.");
+//   }
   
-  const { body } = await elasticsearchClient.search({
-    index: 'products',
-    from: skip,
-    size: limit,
-    body: {
-      query: {
-        multi_match: {
-          query: searchText,
-          fields: ['name^3', 'description', 'category']
-        }
-      }
-    }
-  });
-  const hits = body.hits.hits;
-  const results = hits.map(hit => hit._source);
-  res.json({
-    page,
-    limit,
-    totalResults: body.hits.total.value,
-    results
-  });
+//   const { body } = await elasticsearchClient.search({
+//     index: 'products',
+//     from: skip,
+//     size: limit,
+//     body: {
+//       query: {
+//         multi_match: {
+//           query: searchText,
+//           fields: ['name^3', 'description', 'category']
+//         }
+//       }
+//     }
+//   });
+//   const hits = body.hits.hits;
+//   const results = hits.map(hit => hit._source);
+//   res.json({
+//     page,
+//     limit,
+//     totalResults: body.hits.total.value,
+//     results
+//   });
 
- } catch (error) {
-   console.error("Elasticsearch search error:", error);
-   res.status(500);
-   throw new Error("Failed to search products.");
- }
-});
+//  } catch (error) {
+//    console.error("Elasticsearch search error:", error);
+//    res.status(500);
+//    throw new Error("Failed to search products.");
+//  }
+// });

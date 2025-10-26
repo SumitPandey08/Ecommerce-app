@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HttpClientModule } from '@angular/common/http';
-import { Signup } from './signup';
+import { Otp } from './otp';
 
-describe('Signup', () => {
-  let component: Signup;
-  let fixture: ComponentFixture<Signup>;
+describe('Otp', () => {
+  let component: Otp;
+  let fixture: ComponentFixture<Otp>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Signup, HttpClientModule]
+      imports: [Otp]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Signup);
+    fixture = TestBed.createComponent(Otp);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
