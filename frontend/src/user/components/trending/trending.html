@@ -1,0 +1,8 @@
+<div>
+    <h2>Trending Products</h2>
+    <div class="trending-products">
+        @for (product of trendingProducts; track product.id) {
+            <app-productcard [product]="product"></app-productcard>
+        }
+    </div>
+</div>

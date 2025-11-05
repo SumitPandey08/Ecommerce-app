@@ -1,0 +1,21 @@
+<div class="product-card" *ngIf="product">
+  <div class="product-image-container">
+    <!-- Link to product detail page, using product.id for dynamic routing -->
+    <a [routerLink]="['/product', product.id]" class="product-image-link">
+      <img [src]="product.image" [alt]="product.name" class="product-image">
+    </a>
+    <div class="product-actions">
+      <button class="action-btn cart-btn">Add to Cart</button>
+      <button class="action-btn favorite-btn" aria-label="Add to Wishlist">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </button>
+    </div>
+    <!-- You might want to make this dynamic based on product data, e.g., product.isNew -->
+    <span class="product-badge" *ngIf="product.isNew">NEW</span>
+  </div>
+  <div class="product-info">
+    <p class="product-category">{{product.category}}</p>
+    <h3 class="product-name"><a [routerLink]="['/product', product.id]">{{product.name}}</a></h3>
+    <p class="product-price">${{product.price | number:'1.2-2'}}</p>
+  </div>
+</div>

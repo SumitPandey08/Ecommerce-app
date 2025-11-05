@@ -1,59 +1,81 @@
-.navbar {
-  background: #000;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-
-.navbar-container {
+.main-nav {
   display: flex;
   justify-content: space-between;
-  height: 80px;
-  z-index: 1;
+  align-items: center;
+  padding: 20px 50px;
+  background-color: #fff;
+  color: #000;
+  font-family: 'Montserrat', sans-serif;
+  border-bottom: 1px solid #eee;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 0 24px;
-  max-width: 1100px;
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
-.navbar-logo {
-  color: #fff;
-  justify-self: start;
-  cursor: pointer;
+.nav-logo a {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #000;
   text-decoration: none;
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  margin-left: 24px;
-  font-weight: bold;
-}
-
-.nav-menu {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  text-align: center;
-  margin-right: -22px;
-}
-
-.nav-item {
-  height: 80px;
 }
 
 .nav-links {
-  color: #fff;
+  list-style: none;
   display: flex;
-  align-items: center;
-  text-decoration: none;
-  padding: 0 1rem;
-  height: 100%;
-  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  gap: 40px;
 }
 
-.nav-links:hover {
-  border-bottom: 3px solid #fff;
+.nav-links a {
+  color: #000;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #000;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-button {
+  padding: 10px 25px;
+  border: 2px solid #000;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #fff;
+  color: #000;
 }
