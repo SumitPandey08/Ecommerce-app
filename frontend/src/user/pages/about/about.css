@@ -1,0 +1,77 @@
+.about-us-page {
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  background-color: #fff;
+}
+
+.about-header {
+  background: #f8f9fa;
+  color: #333;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.header-content h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header-content p {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.our-mission-section, .our-story-section {
+  display: flex;
+  align-items: center;
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.our-mission-section .mission-content, .our-story-section .story-content {
+  flex: 1;
+  padding: 0 40px;
+}
+
+.our-mission-section .mission-image, .our-story-section .story-image {
+  flex: 1;
+}
+
+.our-mission-section img, .our-story-section img {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+.our-philosophy-section {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.our-philosophy-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.philosophy-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.philosophy-item {
+  max-width: 300px;
+}
+
+.philosophy-item h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.philosophy-item p {
+  color: #777;
+}
