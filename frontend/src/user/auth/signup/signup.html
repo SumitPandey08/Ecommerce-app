@@ -4,7 +4,7 @@
       <h2>Create an Account</h2>
       <p>Get started with your free account</p>
     </div>
-    <form id="signup-form">
+    <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" [(ngModel)]="signupData.username" id="username" name="username" required />
@@ -21,7 +21,7 @@
         <label for="confirmPassword">Confirm Password</label>
         <input type="password" [(ngModel)]="signupData.confirmPassword" id="confirmPassword" name="confirmPassword" required />
       </div>
-      <button class="btn" (click)="onSubmit()" type="submit">Sign Up</button>
+      <button type="submit" class="btn" [disabled]="!signupForm.form.valid">Sign Up</button>
     </form>
     <div class="login-link">
       <p>Already have an account? <a routerLink="/login">Log in</a></p>

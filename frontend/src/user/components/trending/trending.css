@@ -1,0 +1,20 @@
+.trending-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trending-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.trending-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
+}

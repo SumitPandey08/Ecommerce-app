@@ -4,8 +4,10 @@
   background-color: #fff;
   overflow: hidden;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
-  width: 300px; /* Or use a responsive width */
+  width: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -16,6 +18,7 @@
 .product-image-container {
   position: relative;
   overflow: hidden;
+  height: 280px; /* Set a fixed height for the image container */
 }
 
 .product-image-link {
@@ -24,9 +27,10 @@
 
 .product-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   transition: transform 0.4s ease;
+  object-fit: cover; /* Ensures the image covers the container without distortion */
 }
 
 .product-card:hover .product-image {
@@ -55,6 +59,7 @@
   padding: 15px;
   display: flex;
   gap: 10px;
+  justify-content: center;
   background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
   transform: translateY(100%);
   transition: transform 0.3s ease;
@@ -76,11 +81,14 @@
 }
 
 .cart-btn {
-  flex-grow: 1;
   background-color: #fff;
   color: #000;
   padding: 12px;
   font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .cart-btn:hover {
@@ -106,7 +114,6 @@
   padding: 20px;
   text-align: center;
 }
-
 .product-category {
   font-size: 0.8rem;
   color: #888;
@@ -118,6 +125,10 @@
   font-size: 1rem;
   font-weight: 500;
   margin: 0 0 10px;
+  min-height: 48px; /* Adjust as needed for 2 lines of text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-name a {

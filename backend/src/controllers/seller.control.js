@@ -4,7 +4,20 @@ import bcrypt from "bcryptjs";
 import sendStyledOTP from "../helper/nodemailer.js";
 import accessToken from "../helper/token.js";
 
-// SELLER SIGNUP
+const generateAndSendOTP = async (email, seller) => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiration = new Date();
+    expiration.setMinutes(expiration.getMinutes() + 10); // Set expiration to 10 minutes from now
+    const hashedToken = bcrypt.hashSync(otp.toString(), 10);
+
+    await sendStyledOTP(email, otp);
+
+    seller.verifyToken = hashedToken;
+    seller.verifyTokenExpiration = expiration;
+    await seller.save();
+};
+
+// SELLER SIGNUP 
 export const signUp = asyncHandler(async (req, res) => {
     const { name, email, companyName, password } = req.body;
 
@@ -20,24 +33,16 @@ export const signUp = asyncHandler(async (req, res) => {
         throw new Error("Seller already exists");
     }
 
-    // Generate OTP & hash it
-    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
-    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 mins from now
-    const hashedOTP = bcrypt.hashSync(otp.toString(), 10); // Hash OTP
-
-    // Send OTP email (plaintext code)
-    await sendStyledOTP(email, otp);
-
     // Create seller (not verified yet)
     const seller = await Seller.create({
         name,
         email,
         companyName,
         password, // Will be hashed by schema (see pre('save') in schema)
-        verifyToken: hashedOTP,
-        verifyTokenExpiration: otpExpiration,
         isVerified: false,
     });
+
+    await generateAndSendOTP(email, seller);
 
     if (seller) {
         res.status(201).json({
@@ -104,16 +109,7 @@ export const resendOTP = asyncHandler(async (req, res) => {
         throw new Error("Seller not found");
     }
 
-    // Generate new OTP and hash
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000);
-    const hashedOTP = bcrypt.hashSync(otp.toString(), 10);
-
-    await sendStyledOTP(email, otp);
-
-    seller.verifyToken = hashedOTP;
-    seller.verifyTokenExpiration = otpExpiration;
-    await seller.save();
+    await generateAndSendOTP(email, seller);
 
     res.status(200).json({
         message: "OTP resent successfully",
@@ -177,7 +173,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     const expiration = new Date(Date.now() + 10 * 60 * 1000);
     const hashedToken = bcrypt.hashSync(forgotPasswordToken.toString(), 10);
 
-    await sendStyledOTP(email, forgotPasswordToken);
+    await sendStyledOTP(email, forgotPasswordToken.toString());
 
     seller.isForgotPassword = true;
     seller.forgotPasswordToken = hashedToken;
@@ -305,4 +301,3 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: "Product deleted successfully." });
 });
-

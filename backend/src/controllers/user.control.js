@@ -4,8 +4,22 @@ import bcrypt from "bcryptjs";
 import sendStyledOTP from "../helper/nodemailer.js";
 import accessToken from "../helper/token.js";
 
+const generateAndSendOTP = async (email, user) => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiration = new Date();
+    expiration.setMinutes(expiration.getMinutes() + 10); // Set expiration to 10 minutes from now
+    const hashedToken = bcrypt.hashSync(otp.toString(), 10);
+
+    await sendStyledOTP(email, otp.toString());
+
+    user.verifyToken = hashedToken;
+    user.verifyTokenExpiration = expiration;
+    await user.save();
+};
+
 export const signUp = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
+
     if (!username || !email || !password) {
         res.status(400); throw new Error("Please fill all fields");
     }
@@ -13,14 +27,12 @@ export const signUp = asyncHandler(async (req, res) => {
     if (userExists) {
         res.status(400); throw new Error("User already exists");
     }
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000);
-    const hashedOTP = bcrypt.hashSync(otp.toString(), 10);
-    await sendStyledOTP(email, otp);
+
     const user = await User.create({
-        username, email, password,
-        verifyToken: hashedOTP, verifyTokenExpiration: otpExpiration, isVerified: false,
+        username, email, password, isVerified: false,
     });
+
+    await generateAndSendOTP(email, user);
     if (user) {
         res.status(201).json({
             message: "Registration successful! An OTP has been sent to your email.",
@@ -34,13 +46,16 @@ export const signUp = asyncHandler(async (req, res) => {
 
 export const verifyUser = asyncHandler(async (req, res) => {
     const { email, otp } = req.body;
+
     if (!email || !otp) {
         res.status(400); throw new Error("Please provide email and OTP");
     }
+
     const user = await User.findOne({ email });
     if (!user) {
         res.status(404); throw new Error("User not found");
     }
+
     if (!user.verifyToken || !user.verifyTokenExpiration || user.verifyTokenExpiration < new Date()) {
         res.status(400); throw new Error("OTP has expired");
     }
@@ -61,20 +76,17 @@ export const verifyUser = asyncHandler(async (req, res) => {
 
 export const resendOTP = asyncHandler(async (req, res) => {
     const { email } = req.body;
+
     if (!email) {
         res.status(400); throw new Error("Please provide an email");
     }
+
     const user = await User.findOne({ email });
     if (!user) {
         res.status(404); throw new Error("User not found");
     }
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000);
-    const hashedOTP = bcrypt.hashSync(otp.toString(), 10);
-    await sendStyledOTP(email, otp);
-    user.verifyToken = hashedOTP;
-    user.verifyTokenExpiration = otpExpiration;
-    await user.save();
+    await generateAndSendOTP(email, user);
+
     res.status(200).json({
         message: "OTP resent successfully",
         userId: user._id,
@@ -84,45 +96,59 @@ export const resendOTP = asyncHandler(async (req, res) => {
 
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+
     if (!email || !password) {
         res.status(400); throw new Error("Please fill all fields");
     }
+
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
         res.status(404); throw new Error("User not found");
     }
+
     if (!user.isVerified) {
         res.status(403); throw new Error("Account not verified. Please verify your account first.");
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
         res.status(401); throw new Error("Invalid credentials");
     }
+
     const token = accessToken(user._id, user.email);
+
+    // We need to send the full user object to the frontend
+    const userResponse = user.toObject();
+    delete userResponse.password; // Ensure password is not sent
+
     res.status(200).json({
         message: "Login successful",
-        userId: user._id,
-        email: user.email,
+        user: userResponse,
         accessToken: token,
     });
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
+
     if (!email) {
         res.status(400); throw new Error("Please provide an email");
     }
+
     const user = await User.findOne({ email });
     if (!user) {
         res.status(404); throw new Error("User not found");
     }
+
     const forgotPasswordToken = Math.floor(100000 + Math.random() * 900000);
     const expiration = new Date(Date.now() + 10 * 60 * 1000);
     const hashedToken = bcrypt.hashSync(forgotPasswordToken.toString(), 10);
-    await sendStyledOTP(email, forgotPasswordToken);
+
+    await sendStyledOTP(email, forgotPasswordToken.toString());
     user.isForgotPassword = true;
     user.forgotPasswordToken = hashedToken;
     user.forgotPasswordTokenExpiration = expiration;
+
     await user.save();
     res.status(200).json({
         message: "Forgot password token sent successfully",
@@ -133,25 +159,31 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
 export const resetPassword = asyncHandler(async (req, res) => {
     const { email, forgotPasswordToken, newPassword } = req.body;
+
     if (!email || !forgotPasswordToken || !newPassword) {
         res.status(400); throw new Error("Please fill all fields");
     }
+
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
         res.status(404); throw new Error("User not found");
     }
+
     if (!user.forgotPasswordTokenExpiration || user.forgotPasswordTokenExpiration < new Date()) {
         res.status(400); throw new Error("Forgot password token has expired");
     }
+
     const isTokenValid = bcrypt.compareSync(forgotPasswordToken.toString(), user.forgotPasswordToken);
     if (!isTokenValid) {
         res.status(400); throw new Error("Invalid forgot password token");
     }
+
     user.password = newPassword;
     user.isForgotPassword = false;
     user.forgotPasswordToken = null;
     user.forgotPasswordTokenExpiration = null;
     await user.save();
+
     res.status(200).json({
         message: "Password reset successfully",
         userId: user._id,

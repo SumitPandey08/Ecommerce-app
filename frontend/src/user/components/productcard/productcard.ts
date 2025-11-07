@@ -12,6 +12,7 @@ interface Product {
   rating: number;
   countInStock: number;
   numReviews: number;
+  isNew: boolean;
 }
 @Component({
   selector: 'app-productcard',

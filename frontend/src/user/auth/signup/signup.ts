@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ApiService } from '../../../api-service';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 interface User {
   username: string;
@@ -12,7 +12,7 @@ interface User {
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './signup.html',
   styleUrl: './signup.css',
 })
@@ -38,10 +38,11 @@ export class Signup {
       password: this.signupData.password
     };
 
-    this.apiService.postData('http://localhost:5000/api/users/signup', payload).subscribe({
+    this.apiService.postData('users/signup', payload).subscribe({
       next: (response) => {
         console.log(response);
         alert('Signup successful!');
+        sessionStorage.setItem('otp_email', this.signupData.email);
         this.router.navigate(['/otp_verify'], { state: { email: this.signupData.email } });
       },
       error: (error) => {

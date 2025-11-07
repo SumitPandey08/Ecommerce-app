@@ -1,18 +1,30 @@
 import { Component } from '@angular/core';
 import { ApiService } from '../../../api-service';
 import { FormsModule } from '@angular/forms';
+import { Router , RouterLink } from '@angular/router';
+import { UserState } from './auth.state';
+import { AuthService } from '../auth.service';
+
+
+interface LoginResponse {
+  message: string;
+  user: UserState;
+  accessToken: string;
+}
 
 interface User{
   email: string;
   password: string;
 }
 
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ FormsModule ],
+  imports: [ FormsModule, RouterLink ],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css',],
+  providers: [ApiService]
 })
 
 export class Login {
@@ -21,7 +33,7 @@ export class Login {
     password: ''
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService , private router: Router, private authService: AuthService) {}
 
   onSubmit() {
     const payload = {
@@ -29,10 +41,15 @@ export class Login {
       password: this.loginData.password
     };
 
-    this.apiService.postData('http://localhost:5000/api/users/login', payload).subscribe({
+    this.apiService.postData<LoginResponse>('users/login', payload).subscribe({
       next: (response) => {
+
         console.log(response);
         alert('Login successful!');
+
+        this.authService.login(response.user, response.accessToken);
+
+        this.router.navigate(['/']);
       },
       error: (error) => {
         console.error(error);

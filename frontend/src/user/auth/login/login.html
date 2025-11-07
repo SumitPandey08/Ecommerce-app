@@ -4,7 +4,7 @@
       <h2>Welcome Back!</h2>
       <p>Sign in to continue</p>
     </div>
-    <form id="login-form">
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" [(ngModel)]="loginData.email" id="email" name="email" required />
@@ -15,7 +15,7 @@
       </div>
       <div class="form-footer">
         <a href="#" class="forgot-password">Forgot Password?</a>
-        <button class="btn" (click)="onSubmit()" type="submit">Login</button>
+        <button type="submit" class="btn" [disabled]="!loginForm.form.valid">Login</button>
       </div>
     </form>
     <div class="signup-link">

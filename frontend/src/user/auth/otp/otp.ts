@@ -20,10 +20,18 @@ export class Otp implements OnInit {
     email: '',
     otp: ''
   };
+  loading = false;
+  message = '';
 
   constructor(private apiService: ApiService, private router: Router) {
     const navigation = this.router.getCurrentNavigation();
-    this.otpData.email = navigation?.extras?.state?.['email'] ?? '';
+    // First, try to get email from router state
+    let email = navigation?.extras?.state?.['email'];
+    if (!email) {
+      // If not found (e.g., on page refresh), try getting it from sessionStorage
+      email = sessionStorage.getItem('otp_email');
+    }
+    this.otpData.email = email ?? '';
   }
 
   ngOnInit(): void {
@@ -35,36 +43,37 @@ export class Otp implements OnInit {
   }
 
   onSubmit() {
-    const payload = {
-      email: this.otpData.email,
-      otp: this.otpData.otp
-    };
-
-    this.apiService.postData('http://localhost:5000/api/users/verify', payload).subscribe({
+    this.loading = true;
+    this.message = '';
+    this.apiService.verifyOtp(this.otpData).subscribe({
       next: (response) => {
+        this.loading = false;
         console.log(response);
-        alert('OTP verified successfully!');
+        this.message = 'OTP verified successfully!';
+        sessionStorage.removeItem('otp_email'); // Clean up session storage
         this.router.navigate(['/login']);
       },
       error: (error) => {
+        this.loading = false;
         console.error(error);
-        alert('OTP verification failed. Please try again.');
+        this.message = 'OTP verification failed. Please try again.';
       }
     });
   }
 
   onResendOTP() {
-    const payload = {
-      email: this.otpData.email
-    };
-    this.apiService.postData('http://localhost:5000/api/users/resend-otp', payload).subscribe({
+    this.loading = true;
+    this.message = '';
+    this.apiService.resendOtp({ email: this.otpData.email }).subscribe({
       next: (response) => {
+        this.loading = false;
         console.log(response);
-        alert('A new OTP has been sent to your email.');
+        this.message = 'A new OTP has been sent to your email.';
       },
       error: (error) => {
+        this.loading = false;
         console.error(error);
-        alert('Failed to resend OTP. Please try again.');
+        this.message = 'Failed to resend OTP. Please try again.';
       }
     });
   }

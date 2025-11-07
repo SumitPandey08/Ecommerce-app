@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 //cart schema
 const cartItemSchema = new mongoose.Schema(
   {
@@ -44,12 +45,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    VerifyToken: {
+    verifyToken: {
       type: String,
-      default: null,
-    },
-    VerifyTokenExpiration: {
-      type: Date,
       default: null,
     },
     isForgotPassword: {
@@ -60,7 +57,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    forgotPasswordTokenExpiration: {
+    verifyTokenExpiration: {
       type: Date,
       default: null,
     },
@@ -84,6 +81,15 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 
